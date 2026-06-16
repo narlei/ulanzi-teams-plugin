@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 72 72">
+  <rect width="72" height="72" rx="12" fill="#1a1a2e"/>
+  <rect width="72" height="72" rx="12" fill="#5b5fc7" opacity="0.15"/>
+  <!-- Microfone -->
+  <rect x="29" y="14" width="14" height="24" rx="7" fill="#5b5fc7"/>
+  <path d="M20 34 Q20 48 36 48 Q52 48 52 34" stroke="#5b5fc7" stroke-width="3" fill="none" stroke-linecap="round"/>
+  <line x1="36" y1="48" x2="36" y2="56" stroke="#5b5fc7" stroke-width="3" stroke-linecap="round"/>
+  <line x1="28" y1="56" x2="44" y2="56" stroke="#5b5fc7" stroke-width="3" stroke-linecap="round"/>
+</svg>

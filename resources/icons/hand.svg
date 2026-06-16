@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 72 72">
+  <rect width="72" height="72" rx="12" fill="#1a1a2e"/>
+  <rect width="72" height="72" rx="12" fill="#ffcc44" opacity="0.15"/>
+  <!-- Mão levantada -->
+  <rect x="34" y="10" width="8" height="26" rx="4" fill="#ffcc44"/>
+  <rect x="24" y="16" width="8" height="22" rx="4" fill="#ffcc44"/>
+  <rect x="44" y="16" width="8" height="22" rx="4" fill="#ffcc44"/>
+  <rect x="14" y="24" width="8" height="18" rx="4" fill="#ffcc44"/>
+  <path d="M14 40 Q14 58 36 58 Q52 58 52 40 L52 36 L14 36 Z" fill="#ffcc44"/>
+</svg>

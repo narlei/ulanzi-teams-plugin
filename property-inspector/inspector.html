@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Teams Controls - Configuração</title>
+  <link rel="stylesheet" href="../libs/css/udpi.css">
+  <script src="../libs/js/constants.js"></script>
+  <script src="../libs/js/eventEmitter.js"></script>
+  <script src="../libs/js/timers.js"></script>
+  <script src="../libs/js/utils.js"></script>
+  <script src="../libs/js/ulanzideckApi.js"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: #1a1a2e;
+      color: #e0e0e0;
+      padding: 16px;
+      min-height: 100vh;
+    }
+
+    .pi-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 20px;
+      padding-bottom: 14px;
+      border-bottom: 1px solid #2d2d4e;
+    }
+
+    .pi-header .icon {
+      width: 36px; height: 36px;
+      background: #5b5fc7;
+      border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 20px; flex-shrink: 0;
+    }
+
+    .pi-header h2 { font-size: 14px; font-weight: 600; color: #fff; line-height: 1.2; }
+    .pi-header p  { font-size: 11px; color: #8888aa; margin-top: 2px; }
+
+    .info-card {
+      background: #16213e;
+      border: 1px solid #2d2d4e;
+      border-radius: 8px;
+      padding: 12px 14px;
+      margin-bottom: 16px;
+      font-size: 12px;
+      line-height: 1.6;
+      color: #aab;
+    }
+
+    .info-card .shortcut-badge {
+      display: inline-block;
+      background: #2d2d4e;
+      border: 1px solid #5b5fc7;
+      border-radius: 4px;
+      padding: 2px 8px;
+      font-family: monospace;
+      font-size: 12px;
+      color: #9999ff;
+      margin: 4px 2px;
+    }
+
+    .info-card .action-name { font-weight: 600; color: #fff; font-size: 13px; margin-bottom: 6px; }
+
+    .section-title {
+      font-size: 10px; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 0.08em;
+      color: #5b5fc7; margin-bottom: 8px;
+    }
+
+    .form-group { margin-bottom: 14px; }
+
+    .form-group label { display: block; font-size: 12px; color: #aab; margin-bottom: 6px; }
+
+    .form-group input[type="text"] {
+      width: 100%;
+      background: #16213e; border: 1px solid #2d2d4e;
+      border-radius: 6px; padding: 8px 10px;
+      color: #fff; font-family: monospace; font-size: 13px;
+      outline: none; transition: border-color 0.2s;
+    }
+
+    .form-group input[type="text"]:focus { border-color: #5b5fc7; }
+
+    .form-group .hint { font-size: 10px; color: #666688; margin-top: 4px; }
+
+    .btn-row { display: flex; gap: 8px; margin-top: 6px; }
+
+    .btn {
+      flex: 1; padding: 8px 10px;
+      border-radius: 6px; border: none;
+      font-size: 12px; font-weight: 600;
+      cursor: pointer; transition: opacity 0.2s, transform 0.1s;
+    }
+
+    .btn:active { transform: scale(0.97); }
+    .btn:hover  { opacity: 0.85; }
+    .btn-primary   { background: #5b5fc7; color: #fff; }
+    .btn-secondary { background: #2d2d4e; color: #aab; }
+    .btn-danger    { background: #c74444; color: #fff; }
+
+    .shortcut-table {
+      width: 100%; border-collapse: collapse; font-size: 11px; margin-top: 8px;
+    }
+
+    .shortcut-table th {
+      text-align: left; padding: 5px 8px;
+      background: #16213e; color: #666688;
+      font-weight: 600; border-bottom: 1px solid #2d2d4e;
+    }
+
+    .shortcut-table td { padding: 6px 8px; border-bottom: 1px solid #1e1e3a; color: #ccc; }
+    .shortcut-table tr:hover td { background: #1a1a30; }
+    .shortcut-table code { background: #2d2d4e; border-radius: 3px; padding: 1px 5px; font-size: 11px; color: #9999ff; }
+
+    #status-msg {
+      font-size: 11px; padding: 6px 10px;
+      border-radius: 5px; margin-top: 10px; display: none;
+    }
+
+    #status-msg.success { background: #1a3a1a; color: #66cc66; border: 1px solid #336633; }
+    #status-msg.error   { background: #3a1a1a; color: #cc6666; border: 1px solid #663333; }
+
+    .divider { border: none; border-top: 1px solid #2d2d4e; margin: 16px 0; }
+
+    .ptt-note {
+      background: #1e1e0a;
+      border: 1px solid #4a4a20;
+      border-radius: 6px;
+      padding: 8px 10px;
+      font-size: 11px;
+      color: #aaaa66;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+
+<div class="pi-header">
+  <div class="icon">💼</div>
+  <div>
+    <h2 id="action-title">Microsoft Teams</h2>
+    <p id="action-subtitle">Controle de reuniões</p>
+  </div>
+</div>
+
+<div class="info-card">
+  <div class="action-name" id="action-label">—</div>
+  <div>Atalho padrão: <span class="shortcut-badge" id="default-shortcut">—</span></div>
+</div>
+
+<div class="section-title">Personalizar atalho</div>
+
+<div class="form-group">
+  <label for="custom-shortcut">Atalho customizado (opcional)</label>
+  <input type="text" id="custom-shortcut" placeholder="ex: ctrl+shift+m" />
+  <div class="hint">Deixe vazio para usar o atalho padrão. Use letras minúsculas separadas por + (ctrl, shift, alt, espaço=space)</div>
+</div>
+
+<div class="btn-row">
+  <button class="btn btn-primary"   onclick="saveShortcut()">💾 Salvar</button>
+  <button class="btn btn-secondary" onclick="testShortcut()">▶ Testar</button>
+  <button class="btn btn-danger"    onclick="resetShortcut()">↺ Padrão</button>
+</div>
+
+<div id="status-msg"></div>
+<div id="ptt-note" class="ptt-note" style="display:none">
+  ⚠️ Push-to-Talk funciona como alternância (toggle): pressione para ativar/desativar.
+  O atalho Ctrl+Espaço é enviado a cada clique.
+</div>
+
+<hr class="divider">
+
+<div class="section-title">Referência rápida — Atalhos do Teams</div>
+<table class="shortcut-table">
+  <thead><tr><th>Ação</th><th>Atalho</th></tr></thead>
+  <tbody>
+    <tr><td>Mute / Unmute</td><td><code>Ctrl+Shift+M</code></td></tr>
+    <tr><td>Câmera On/Off</td><td><code>Ctrl+Shift+O</code></td></tr>
+    <tr><td>Compartilhar tela</td><td><code>Ctrl+Shift+E</code></td></tr>
+    <tr><td>Levantar mão</td><td><code>Ctrl+Shift+K</code></td></tr>
+    <tr><td>Encerrar chamada</td><td><code>Ctrl+Shift+H</code></td></tr>
+    <tr><td>Push to Talk</td><td><code>Ctrl+Espaço</code> (toggle)</td></tr>
+    <tr><td>Mute global (Win)</td><td><code>Win+Alt+K</code></td></tr>
+  </tbody>
+</table>
+
+<script>
+// ── Mapeamento de UUIDs ───────────────────────────────────────
+const ACTION_INFO = {
+  'com.ulanzi.ulanzistudio.teams.mute':       { label: '🎤 Mute / Unmute',       shortcut: 'ctrl+shift+m', subtitle: 'Ativar/desativar microfone',         isPTT: false },
+  'com.ulanzi.ulanzistudio.teams.camera':     { label: '📷 Câmera On/Off',       shortcut: 'ctrl+shift+o', subtitle: 'Ativar/desativar câmera',             isPTT: false },
+  'com.ulanzi.ulanzistudio.teams.share':      { label: '🖥️ Compartilhar Tela',   shortcut: 'ctrl+shift+e', subtitle: 'Abrir painel de compartilhamento',    isPTT: false },
+  'com.ulanzi.ulanzistudio.teams.hand':       { label: '✋ Levantar Mão',        shortcut: 'ctrl+shift+k', subtitle: 'Levantar/baixar mão',                 isPTT: false },
+  'com.ulanzi.ulanzistudio.teams.hangup':     { label: '📵 Encerrar Chamada',    shortcut: 'ctrl+shift+h', subtitle: 'Sair da reunião',                     isPTT: false },
+  'com.ulanzi.ulanzistudio.teams.pushtotalk': { label: '🔊 Push to Talk',        shortcut: 'ctrl+space',   subtitle: 'Alterna mudo a cada clique (toggle)', isPTT: true  }
+};
+
+let currentContext = null;
+let currentUUID    = null;
+let defaultShortcut = '';
+
+// Conecta com o UUID da ação (detectado via URL params ou fallback)
+// A API lê "actionId" do query string — este campo identifica a instância do botão,
+// não a UUID da ação. Usamos "mute" como UUID inicial e atualizamos em onAdd.
+$UD.connect('com.ulanzi.ulanzistudio.teams.mute');
+
+// ── Ação adicionada (recebe contexto e configurações salvas) ──
+$UD.onAdd((data) => {
+  currentContext = data.context;
+  currentUUID    = data.uuid || null;
+
+  const info = ACTION_INFO[currentUUID] || {
+    label: '⚙️ Teams Action', shortcut: 'ctrl+shift+m', subtitle: 'Controle do Teams', isPTT: false
+  };
+
+  defaultShortcut = info.shortcut;
+
+  document.getElementById('action-label').textContent     = info.label;
+  document.getElementById('action-subtitle').textContent  = info.subtitle;
+  document.getElementById('default-shortcut').textContent = info.shortcut;
+  document.getElementById('ptt-note').style.display       = info.isPTT ? 'block' : 'none';
+
+  // Carrega atalho salvo (se houver)
+  const saved = data.param;
+  if (saved && saved.customShortcut) {
+    document.getElementById('custom-shortcut').value = saved.customShortcut;
+  }
+});
+
+// ── Atualização de configurações pelo app ─────────────────────
+$UD.onParamFromApp((data) => {
+  if (!data || !data.param) return;
+  const saved = data.param;
+  if (saved.customShortcut !== undefined) {
+    document.getElementById('custom-shortcut').value = saved.customShortcut;
+  }
+});
+
+// ── Ações dos botões ─────────────────────────────────────────
+function saveShortcut() {
+  const val = document.getElementById('custom-shortcut').value.trim();
+  // Envia para o plugin principal via sendParamFromPlugin
+  // (Ulanzi Deck salva e encaminha ao app.js via onParamFromPlugin)
+  $UD.sendParamFromPlugin({ customShortcut: val });
+  showStatus('Atalho salvo com sucesso!', 'success');
+}
+
+function testShortcut() {
+  // Pede ao plugin principal para disparar o atalho de teste
+  $UD.sendParamFromPlugin({ action: 'test' });
+  showStatus('Testando atalho no Teams...', 'success');
+}
+
+function resetShortcut() {
+  document.getElementById('custom-shortcut').value = '';
+  $UD.sendParamFromPlugin({ customShortcut: '' });
+  showStatus('Restaurado para o atalho padrão.', 'success');
+}
+
+function showStatus(msg, type) {
+  const el = document.getElementById('status-msg');
+  el.textContent = msg;
+  el.className = type;
+  el.style.display = 'block';
+  setTimeout(() => { el.style.display = 'none'; }, 2500);
+}
+</script>
+</body>
+</html>

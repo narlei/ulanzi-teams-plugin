@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 72 72">
+  <rect width="72" height="72" rx="12" fill="#1a1a2e"/>
+  <rect width="72" height="72" rx="12" fill="#aa44ff" opacity="0.15"/>
+  <!-- Microfone com ondas -->
+  <rect x="29" y="14" width="14" height="24" rx="7" fill="#aa44ff"/>
+  <path d="M20 34 Q20 46 36 46 Q52 46 52 34" stroke="#aa44ff" stroke-width="3" fill="none" stroke-linecap="round"/>
+  <line x1="36" y1="46" x2="36" y2="54" stroke="#aa44ff" stroke-width="3" stroke-linecap="round"/>
+  <line x1="28" y1="54" x2="44" y2="54" stroke="#aa44ff" stroke-width="3" stroke-linecap="round"/>
+  <!-- Ondas sonoras -->
+  <path d="M10 30 Q8 36 10 42" stroke="#aa44ff" stroke-width="2.5" fill="none" stroke-linecap="round" opacity="0.7"/>
+  <path d="M5 26 Q2 36 5 46" stroke="#aa44ff" stroke-width="2" fill="none" stroke-linecap="round" opacity="0.4"/>
+  <path d="M62 30 Q64 36 62 42" stroke="#aa44ff" stroke-width="2.5" fill="none" stroke-linecap="round" opacity="0.7"/>
+  <path d="M67 26 Q70 36 67 46" stroke="#aa44ff" stroke-width="2" fill="none" stroke-linecap="round" opacity="0.4"/>
+</svg>

@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 72 72">
+  <rect width="72" height="72" rx="12" fill="#1a1a2e"/>
+  <rect width="72" height="72" rx="12" fill="#cc4444" opacity="0.15"/>
+  <!-- Telefone com X -->
+  <path d="M14 38 Q14 24 36 24 Q58 24 58 38" stroke="#cc4444" stroke-width="6" fill="none" stroke-linecap="round"/>
+  <circle cx="18" cy="42" r="6" fill="#cc4444"/>
+  <circle cx="54" cy="42" r="6" fill="#cc4444"/>
+  <!-- X -->
+  <line x1="29" y1="44" x2="43" y2="58" stroke="#cc4444" stroke-width="3" stroke-linecap="round"/>
+  <line x1="43" y1="44" x2="29" y2="58" stroke="#cc4444" stroke-width="3" stroke-linecap="round"/>
+</svg>

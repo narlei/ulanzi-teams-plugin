@@ -1,0 +1,81 @@
+{
+  "Author": "Rodrigo Curi Garcia",
+  "Name": "Microsoft Teams Controls",
+  "Description": "Controle reuniões do Microsoft Teams: mute, câmera, compartilhar tela, levantar mão e encerrar chamada.",
+  "Icon": "resources/icon-teams.png",
+  "Version": "1.0.0",
+  "UUID": "com.ulanzi.ulanzistudio.teams",
+  "Type": "JavaScript",
+  "CodePath": "plugin/app.js",
+  "Actions": [
+    {
+      "Name": "Mute / Unmute",
+      "Icon": "resources/icons/mute.png",
+      "UUID": "com.ulanzi.ulanzistudio.teams.mute",
+      "PropertyInspectorPath": "property-inspector/inspector.html",
+      "States": [
+        { "Name": "Ativo", "Image": "resources/icons/mute.png" }
+      ],
+      "Controllers": ["Keypad"],
+      "Devices": []
+    },
+    {
+      "Name": "Câmera On/Off",
+      "Icon": "resources/icons/camera.png",
+      "UUID": "com.ulanzi.ulanzistudio.teams.camera",
+      "PropertyInspectorPath": "property-inspector/inspector.html",
+      "States": [
+        { "Name": "Ativo", "Image": "resources/icons/camera.png" }
+      ],
+      "Controllers": ["Keypad"],
+      "Devices": []
+    },
+    {
+      "Name": "Compartilhar Tela",
+      "Icon": "resources/icons/share.png",
+      "UUID": "com.ulanzi.ulanzistudio.teams.share",
+      "PropertyInspectorPath": "property-inspector/inspector.html",
+      "States": [
+        { "Name": "Ativo", "Image": "resources/icons/share.png" }
+      ],
+      "Controllers": ["Keypad"],
+      "Devices": []
+    },
+    {
+      "Name": "Levantar Mão",
+      "Icon": "resources/icons/hand.png",
+      "UUID": "com.ulanzi.ulanzistudio.teams.hand",
+      "PropertyInspectorPath": "property-inspector/inspector.html",
+      "States": [
+        { "Name": "Ativo", "Image": "resources/icons/hand.png" }
+      ],
+      "Controllers": ["Keypad"],
+      "Devices": []
+    },
+    {
+      "Name": "Encerrar Chamada",
+      "Icon": "resources/icons/hangup.png",
+      "UUID": "com.ulanzi.ulanzistudio.teams.hangup",
+      "PropertyInspectorPath": "property-inspector/inspector.html",
+      "States": [
+        { "Name": "Ativo", "Image": "resources/icons/hangup.png" }
+      ],
+      "Controllers": ["Keypad"],
+      "Devices": []
+    },
+    {
+      "Name": "Push to Talk",
+      "Icon": "resources/icons/pushtotalk.png",
+      "UUID": "com.ulanzi.ulanzistudio.teams.pushtotalk",
+      "PropertyInspectorPath": "property-inspector/inspector.html",
+      "States": [
+        { "Name": "Ativo", "Image": "resources/icons/pushtotalk.png" }
+      ],
+      "Controllers": ["Keypad"],
+      "Devices": []
+    }
+  ],
+  "OS": [
+    { "Platform": "windows", "MinimumVersion": "10" }
+  ]
+}

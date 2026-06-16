@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <script src="../libs/js/constants.js"></script>
+  <script src="../libs/js/eventEmitter.js"></script>
+  <script src="../libs/js/timers.js"></script>
+  <script src="../libs/js/utils.js"></script>
+  <script src="../libs/js/ulanziApi.js"></script>
+</head>
+<body>
+<script>
+// ============================================================
+// Microsoft Teams Controls Plugin - Main Service
+// Protocolo: UlanziDeck Plugin SDK V2.1.2
+// Estratégia: Foca o Teams e dispara atalhos de teclado
+// ============================================================
+
+// Mapeamento de ações → atalhos de teclado do Teams (Windows)
+const TEAMS_SHORTCUTS = {
+  'com.ulanzi.ulanzistudio.teams.mute':       { keys: 'ctrl+shift+m', label: 'Mute'         },
+  'com.ulanzi.ulanzistudio.teams.camera':     { keys: 'ctrl+shift+o', label: 'Câmera'       },
+  'com.ulanzi.ulanzistudio.teams.share':      { keys: 'ctrl+shift+e', label: 'Compartilhar' },
+  'com.ulanzi.ulanzistudio.teams.hand':       { keys: 'ctrl+shift+k', label: 'Mão'          },
+  'com.ulanzi.ulanzistudio.teams.hangup':     { keys: 'ctrl+shift+h', label: 'Encerrar'     },
+  'com.ulanzi.ulanzistudio.teams.pushtotalk': { keys: 'ctrl+space',   label: 'Push-to-Talk', hold: true }
+};
+
+// Estado por contexto (cada botão físico tem seu próprio contexto)
+const state = {};
+
+// Atalhos customizados salvos via PropertyInspector
+const customShortcuts = {};
+
+// Conecta ao UlanziStudio com o UUID do plugin principal
+$UD.connect('com.ulanzi.ulanzistudio.teams');
+
+// ── Conexão estabelecida ──────────────────────────────────────
+$UD.onConnected(() => {
+  console.log('[TeamsPlugin] Conectado ao UlanziStudio');
+  $UD.getGlobalSettings();
+});
+
+// ── Ação adicionada a um botão ───────────────────────────────
+$UD.onAdd((message) => {
+  const ctx = message.context;
+  const uuid = $UD.decodeContext(ctx).uuid;
+  state[ctx] = { uuid, active: false, holdInterval: null };
+
+  // Carrega configurações salvas para este contexto
+  $UD.getSettings(ctx);
+
+  console.log('[TeamsPlugin] Ação adicionada:', uuid, ctx);
+});
+
+// ── Configurações recebidas ───────────────────────────────────
+$UD.onDidReceiveSettings((message) => {
+  const ctx = message.context;
+  const param = message.param || {};
+  if (param.customShortcut) {
+    customShortcuts[ctx] = param.customShortcut;
+  }
+});
+
+// ── Botão pressionado (ação principal) ───────────────────────
+$UD.onRun((message) => {
+  const ctx = message.context;
+  const uuid = $UD.decodeContext(ctx).uuid;
+  const shortcutConfig = TEAMS_SHORTCUTS[uuid];
+
+  if (!shortcutConfig) return;
+
+  // Usa atalho customizado se o usuário tiver configurado
+  const keys = customShortcuts[ctx] || shortcutConfig.keys;
+
+  // Push to Talk é gerenciado via onKeyDown/onKeyUp
+  if (shortcutConfig.hold) return;
+
+  focusTeamsAndSendShortcut(keys, ctx, shortcutConfig.label);
+});
+
+// ── KeyDown: para Push to Talk ────────────────────────────────
+$UD.onKeyDown((message) => {
+  const ctx = message.context;
+  const uuid = $UD.decodeContext(ctx).uuid;
+
+  if (uuid !== 'com.ulanzi.ulanzistudio.teams.pushtotalk') return;
+
+  const keys = customShortcuts[ctx] || 'ctrl+space';
+  focusTeamsAndSendShortcut(keys, ctx, 'Push-to-Talk (segurar)');
+});
+
+// ── KeyUp: libera Push to Talk ────────────────────────────────
+$UD.onKeyUp((message) => {
+  const ctx = message.context;
+  const uuid = $UD.decodeContext(ctx).uuid;
+
+  if (uuid !== 'com.ulanzi.ulanzistudio.teams.pushtotalk') return;
+
+  // Solta as teclas — envia o atalho novamente para liberar
+  const keys = customShortcuts[ctx] || 'ctrl+space';
+  $UD.hotkey(formatHotkeyForUlanzi(keys));
+  console.log('[TeamsPlugin] Push-to-Talk liberado');
+});
+
+// ── Estado ativo/inativo ──────────────────────────────────────
+$UD.onSetActive((message) => {
+  const ctx = message.context;
+  if (state[ctx]) state[ctx].active = message.active;
+});
+
+// ── Ação removida ─────────────────────────────────────────────
+$UD.onClear((message) => {
+  if (!message.param) return;
+  for (const item of message.param) {
+    delete state[item.context];
+    delete customShortcuts[item.context];
+  }
+});
+
+// ── Recebe dados do PropertyInspector ────────────────────────
+$UD.onSendToPlugin((message) => {
+  const ctx = message.context;
+  const data = message.param;
+
+  if (data && data.action === 'saveShortcut') {
+    customShortcuts[ctx] = data.shortcut;
+    $UD.setSettings({ customShortcut: data.shortcut }, ctx);
+    $UD.toast('Atalho salvo: ' + data.shortcut);
+  }
+
+  if (data && data.action === 'testShortcut') {
+    const uuid = $UD.decodeContext(ctx).uuid;
+    const shortcutConfig = TEAMS_SHORTCUTS[uuid];
+    const keys = customShortcuts[ctx] || shortcutConfig.keys;
+    focusTeamsAndSendShortcut(keys, ctx, 'Teste');
+  }
+});
+
+// ============================================================
+// FUNÇÕES AUXILIARES
+// ============================================================
+
+/**
+ * Foca a janela do Teams e dispara o atalho de teclado.
+ * O Teams precisa estar em foco para receber os atalhos.
+ */
+function focusTeamsAndSendShortcut(keys, ctx, label) {
+  console.log('[TeamsPlugin] Acionando:', label, '→', keys);
+
+  // Usa o hotkey nativo do UlanziStudio
+  // O Teams deve estar aberto — o atalho global do Windows (Win+Alt+K)
+  // funciona de qualquer lugar para mute, mas para os demais precisamos
+  // de foco. Avisamos o usuário via toast se necessário.
+  try {
+    $UD.hotkey(formatHotkeyForUlanzi(keys));
+    console.log('[TeamsPlugin] Atalho enviado:', keys);
+  } catch (e) {
+    $UD.toast('Erro: ' + e.message);
+    console.error('[TeamsPlugin] Erro ao enviar atalho:', e);
+  }
+}
+
+/**
+ * Converte formato "ctrl+shift+m" para o formato aceito pelo UlanziStudio.
+ * UlanziStudio aceita: "Ctrl+Shift+M"
+ */
+function formatHotkeyForUlanzi(keys) {
+  return keys
+    .split('+')
+    .map(k => {
+      const map = {
+        'ctrl':  'Ctrl',
+        'shift': 'Shift',
+        'alt':   'Alt',
+        'space': 'Space',
+        'win':   'Win'
+      };
+      return map[k.toLowerCase()] || k.toUpperCase();
+    })
+    .join('+');
+}
+</script>
+</body>
+</html>

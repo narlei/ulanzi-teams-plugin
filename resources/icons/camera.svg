@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 72 72">
+  <rect width="72" height="72" rx="12" fill="#1a1a2e"/>
+  <rect width="72" height="72" rx="12" fill="#33cc99" opacity="0.15"/>
+  <!-- Câmera -->
+  <rect x="10" y="24" width="38" height="28" rx="5" fill="#33cc99"/>
+  <circle cx="29" cy="38" r="8" fill="#1a1a2e"/>
+  <circle cx="29" cy="38" r="5" fill="#33cc99"/>
+  <!-- Lente -->
+  <polyline points="48,30 62,22 62,54 48,46" fill="#33cc99"/>
+</svg>
