@@ -3,7 +3,7 @@
   "Name": "Microsoft Teams Controls",
   "Description": "Controle reuniões do Microsoft Teams: mute, câmera, compartilhar tela, levantar mão e encerrar chamada.",
   "Icon": "resources/icon-teams.png",
-  "Version": "1.0.0",
+  "Version": "1.0.1",
   "UUID": "com.ulanzi.ulanzistudio.teams",
   "Type": "JavaScript",
   "CodePath": "plugin/app.js",
