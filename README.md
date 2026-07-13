@@ -1,5 +1,7 @@
 # Microsoft Teams Controls — Ulanzi Deck Plugin
 
+[![Available on Ulanzi Community Store](https://raw.githubusercontent.com/narlei/ulanzicommunitystore/main/docs/badges/ulanzi-community-store.svg)](https://ulanzicommunitystore.narlei.com)
+
 Control your **Microsoft Teams** meetings directly from your Ulanzi Deck macro keyboard. One button press to mute, toggle camera, share screen, raise hand, end a call, or push-to-talk — no need to switch windows.
 
 ---
